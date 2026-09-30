@@ -1,0 +1,12 @@
+# PixelProse runtime dependencies  (Python 3.10+)
+# Tip: on Linux without an NVIDIA GPU, install the much smaller CPU build of PyTorch first:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.2
+transformers>=4.56,<5
+huggingface_hub>=0.23
+safetensors>=0.4
+fastapi>=0.110
+uvicorn[standard]>=0.27
+python-multipart>=0.0.9
+pillow>=10.0
+numpy>=1.26

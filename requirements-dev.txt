@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest>=8.0
+httpx>=0.27
+python-pptx>=1.0   # only needed to rebuild presentation/PixelProse.pptx

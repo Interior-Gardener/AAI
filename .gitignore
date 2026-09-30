@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Local configuration & data
+.env
+models/
+reports/*.json
+!reports/evaluation.json
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+presentation/node_modules/
