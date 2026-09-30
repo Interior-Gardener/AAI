@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PixelProse · AI Image Caption Generator</title>
+  <meta name="description" content="Upload any image and get a natural-language caption, word-level visual explanations and answers to your questions — powered by BLIP vision-language transformers." />
+  <meta name="theme-color" content="#07070d" />
+  <link rel="icon" href="/static/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    try { const t = localStorage.getItem("pixelprose.theme"); if (t) document.documentElement.dataset.theme = t; } catch (_) {}
+  </script>
+</head>
+<body>
+  <!-- ============ SVG icon sprite ============ -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#8b5cf6" /><stop offset=".55" stop-color="#6366f1" /><stop offset="1" stop-color="#22d3ee" />
+      </linearGradient>
+    </defs>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/><path d="M19 2v4M21 4h-4"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.02-.23-.27-.38-.62-.38-1 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-4.96-4.49-9-10-9z"/></symbol>
+    <symbol id="i-hash" viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+    <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8M16 17H8"/></symbol>
+    <symbol id="i-scan" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+    <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a4 4 0 0 0 6 0zM19 7l-3 7a4 4 0 0 0 6 0zM8 21h8"/></symbol>
+  </svg>
+
+  <!-- ============ Ambient background ============ -->
+  <div class="aurora" aria-hidden="true">
+    <span class="orb orb-1"></span><span class="orb orb-2"></span><span class="orb orb-3"></span>
+  </div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"></div>
+
+  <!-- ============ Navigation ============ -->
+  <header class="nav" id="nav">
+    <a class="brand" href="#top" aria-label="PixelProse home">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <rect x="1" y="1" width="38" height="38" rx="11" fill="url(#brandGrad)" />
+        <path d="M9 17c3.2-5 7-7.5 11-7.5S27.8 12 31 17c-3.2 5-7 7.5-11 7.5S12.2 22 9 17z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round" />
+        <circle class="brand-pupil" cx="20" cy="17" r="3.4" fill="#fff" />
+        <rect x="11" y="28.5" width="18" height="2.6" rx="1.3" fill="#fff" opacity=".9" />
+        <rect class="brand-cursor" x="30.5" y="27.5" width="2" height="4.6" rx="1" fill="#fff" />
+      </svg>
+      <span class="brand-name">Pixel<span>Prose</span></span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#studio">Studio</a>
+      <a href="#batch">Batch</a>
+      <a href="#how">How it works</a>
+      <a href="#team">Team</a>
+      <a href="/docs" target="_blank" rel="noopener">API</a>
+    </nav>
+    <div class="nav-actions">
+      <div class="status-pill" id="statusPill" title="Model status">
+        <span class="status-dot"></span><span class="status-text">Connecting…</span>
+      </div>
+      <button class="icon-btn" id="historyBtn" aria-label="Open history" data-tip="History (H)">
+        <svg><use href="#i-history" /></svg><span class="badge" id="historyCount" hidden>0</span>
+      </button>
+      <button class="icon-btn" id="themeBtn" aria-label="Toggle theme" data-tip="Theme (T)">
+        <svg class="only-dark"><use href="#i-sun" /></svg><svg class="only-light"><use href="#i-moon" /></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ============ Hero ============ -->
+    <section class="hero">
+      <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+      <div class="hero-copy">
+        <div class="eyebrow reveal"><span class="pulse-dot"></span> Vision-Language AI · BLIP Transformers</div>
+        <h1 class="hero-title reveal">
+          Turn <span class="gradient-text">pixels</span><br />into <span class="word-rotator" id="wordRotator"><span>prose.</span></span>
+        </h1>
+        <p class="hero-sub reveal">
+          Drop in any photo and PixelProse writes a human-like description, shows <em>where</em> it looked
+          for every word, and answers your questions about the scene.
+        </p>
+        <div class="hero-cta reveal">
+          <a class="btn btn-primary magnetic" href="#studio"><svg><use href="#i-sparkles" /></svg> Start captioning</a>
+          <a class="btn btn-ghost magnetic" href="#how"><svg><use href="#i-book" /></svg> How it works</a>
+        </div>
+        <dl class="hero-stats reveal">
+          <div><dt><span class="count" data-to="4">0</span></dt><dd>AI models working together</dd></div>
+          <div><dt><span class="count" data-to="129">0</span>M</dt><dd>images BLIP learned from</dd></div>
+          <div><dt><span class="count" data-to="446">0</span>M</dt><dd>parameters in the captioner</dd></div>
+        </dl>
+      </div>
+      <div class="hero-visual reveal">
+        <div class="demo-card tilt" id="demoCard">
+          <div class="demo-img">
+            <img id="demoImg" alt="Example image being captioned" />
+            <div class="scan-line"></div>
+            <div class="demo-boxes"><span></span><span></span></div>
+          </div>
+          <div class="demo-caption">
+            <div class="demo-label"><svg><use href="#i-sparkles" /></svg> AI caption</div>
+            <p id="demoText" class="typing"></p>
+            <div class="demo-meter"><span id="demoMeter"></span></div>
+          </div>
+        </div>
+        <div class="float-chip chip-a"><svg><use href="#i-eye" /></svg> Explainable</div>
+        <div class="float-chip chip-b"><svg><use href="#i-message" /></svg> Ask questions</div>
+        <div class="float-chip chip-c"><svg><use href="#i-zap" /></svg> Runs locally</div>
+      </div>
+      <a class="scroll-hint" href="#studio" aria-label="Scroll to studio"><span></span></a>
+    </section>
+
+    <!-- ============ Studio ============ -->
+    <section class="section" id="studio">
+      <div class="section-head reveal">
+        <span class="kicker">01 · Caption Studio</span>
+        <h2>Upload. Understand. <span class="gradient-text">Describe.</span></h2>
+        <p>Drag an image, paste one with <kbd>Ctrl</kbd>+<kbd>V</kbd>, grab a URL, snap a photo, or pick a sample.</p>
+      </div>
+
+      <div class="studio">
+        <!-- ----- Left: input ----- -->
+        <div class="panel input-panel reveal">
+          <div class="tabs" role="tablist" id="sourceTabs">
+            <button role="tab" class="tab active" data-source="upload"><svg><use href="#i-upload" /></svg>Upload</button>
+            <button role="tab" class="tab" data-source="url"><svg><use href="#i-link" /></svg>URL</button>
+            <button role="tab" class="tab" data-source="camera"><svg><use href="#i-camera" /></svg>Camera</button>
+            <button role="tab" class="tab" data-source="samples"><svg><use href="#i-grid" /></svg>Samples</button>
+            <span class="tab-indicator"></span>
+          </div>
+
+          <div class="stage" id="stage">
+            <!-- empty / drop zone -->
+            <label class="dropzone" id="dropzone" for="fileInput">
+              <input type="file" id="fileInput" accept="image/*" hidden />
+              <div class="drop-art">
+                <div class="drop-ring"></div><div class="drop-ring r2"></div>
+                <svg class="drop-icon"><use href="#i-upload" /></svg>
+              </div>
+              <strong>Drop an image here</strong>
+              <span>or <u>browse files</u> · JPG, PNG, WEBP, GIF up to 15&nbsp;MB</span>
+            </label>
+
+            <!-- preview -->
+            <div class="preview" id="preview" hidden>
+              <img id="previewImg" alt="Selected image" />
+              <canvas id="heatCanvas" class="heat-canvas"></canvas>
+              <div class="scanner" id="scanner" hidden>
+                <div class="scan-beam"></div>
+                <div class="scan-grid"></div>
+              </div>
+              <button class="icon-btn preview-clear" id="clearBtn" aria-label="Remove image" data-tip="Remove (Esc)"><svg><use href="#i-x" /></svg></button>
+              <div class="preview-meta" id="previewMeta"></div>
+            </div>
+
+            <!-- URL -->
+            <form class="source-pane" id="urlPane" hidden>
+              <svg class="pane-icon"><use href="#i-link" /></svg>
+              <p>Paste a direct link to an image on the web.</p>
+              <div class="input-row">
+                <input type="url" id="urlInput" placeholder="https://example.com/photo.jpg" required />
+                <button class="btn btn-primary" type="submit">Load</button>
+              </div>
+            </form>
+
+            <!-- Camera -->
+            <div class="source-pane camera-pane" id="cameraPane" hidden>
+              <video id="cameraVideo" playsinline muted></video>
+              <div class="camera-actions">
+                <button class="btn btn-ghost" id="cameraFlip" type="button"><svg><use href="#i-refresh" /></svg>Flip</button>
+                <button class="shutter" id="cameraShot" type="button" aria-label="Take photo"></button>
+                <span class="camera-hint">Allow camera access</span>
+              </div>
+            </div>
+
+            <!-- Samples -->
+            <div class="source-pane samples-pane" id="samplesPane" hidden>
+              <div class="sample-filters" id="sampleFilters"></div>
+              <div class="sample-grid" id="sampleGrid"></div>
+            </div>
+          </div>
+
+          <!-- Settings -->
+          <details class="settings" id="settings">
+            <summary><svg><use href="#i-sliders" /></svg> Generation settings <svg class="chev"><use href="#i-chevron" /></svg></summary>
+            <div class="settings-body">
+              <div class="field">
+                <label>Model</label>
+                <div class="segmented" data-name="model">
+                  <button type="button" data-value="large" class="active">Large · accurate</button>
+                  <button type="button" data-value="base">Base · fast</button>
+                </div>
+              </div>
+              <div class="field">
+                <label>Caption style <span class="hint" data-tip="Balanced: beam search, then the image-text matcher picks the best (best benchmark score). Detailed: beam + sampling drafts, richer descriptions. Creative: sampling only, more varied wording.">?</span></label>
+                <div class="segmented" data-name="strategy">
+                  <button type="button" data-value="beam" class="active">Balanced</button>
+                  <button type="button" data-value="hybrid">Detailed</button>
+                  <button type="button" data-value="sampling">Creative</button>
+                </div>
+              </div>
+              <div class="field-grid">
+                <div class="field">
+                  <label for="numCandidates">Candidates <output id="numCandidatesOut">5</output></label>
+                  <input type="range" id="numCandidates" min="1" max="8" value="5" />
+                </div>
+                <div class="field">
+                  <label for="maxTokens">Max length <output id="maxTokensOut">30</output></label>
+                  <input type="range" id="maxTokens" min="10" max="60" value="30" />
+                </div>
+                <div class="field">
+                  <label for="temperature">Creativity <output id="temperatureOut">0.9</output></label>
+                  <input type="range" id="temperature" min="0.3" max="1.5" step="0.1" value="0.9" />
+                </div>
+                <div class="field">
+                  <label for="numBeams">Beam width <output id="numBeamsOut">5</output></label>
+                  <input type="range" id="numBeams" min="1" max="10" value="5" />
+                </div>
+              </div>
+              <div class="field">
+                <label for="promptInput">Guided prefix <span class="hint" data-tip="Conditional captioning: the caption will start with this text.">?</span></label>
+                <input type="text" id="promptInput" maxlength="60" placeholder="optional, e.g. “a painting of”" />
+                <div class="chips" id="promptChips">
+                  <button type="button">a photograph of</button>
+                  <button type="button">a painting of</button>
+                  <button type="button">a close-up of</button>
+                  <button type="button">a black and white photo of</button>
+                </div>
+              </div>
+              <div class="toggles">
+                <label class="switch"><input type="checkbox" id="rerankToggle" checked /><span></span>Re-rank with image-text matching</label>
+                <label class="switch"><input type="checkbox" id="explainToggle" checked /><span></span>Auto-generate attention maps</label>
+                <label class="switch"><input type="checkbox" id="speakToggle" /><span></span>Read caption aloud</label>
+              </div>
+            </div>
+          </details>
+
+          <button class="btn btn-primary btn-xl generate-btn" id="generateBtn" disabled>
+            <span class="btn-shine"></span>
+            <svg><use href="#i-sparkles" /></svg><span class="label">Generate caption</span>
+            <kbd class="kbd-light">Ctrl ↵</kbd>
+          </button>
+        </div>
+
+        <!-- ----- Right: results ----- -->
+        <div class="panel result-panel reveal" id="resultPanel">
+          <!-- Empty state -->
+          <div class="result-empty" id="resultEmpty">
+            <div class="empty-orbit">
+              <span></span><span></span><span></span>
+              <svg><use href="#i-sparkles" /></svg>
+            </div>
+            <h3>Your caption will appear here</h3>
+            <p>Choose an image on the left, then press <strong>Generate</strong>.</p>
+            <ul class="empty-steps">
+              <li><span>1</span>Vision Transformer reads the image as 576 patches</li>
+              <li><span>2</span>Text decoder writes candidate sentences word by word</li>
+              <li><span>3</span>Matching model picks the one that fits best</li>
+            </ul>
+          </div>
+
+          <!-- Loading state -->
+          <div class="result-loading" id="resultLoading" hidden>
+            <div class="neural">
+              <svg viewBox="0 0 220 120" aria-hidden="true">
+                <g class="edges"></g><g class="nodes"></g>
+              </svg>
+            </div>
+            <ol class="pipeline-steps" id="pipelineSteps">
+              <li data-step="0"><span class="dot"></span>Encoding image patches</li>
+              <li data-step="1"><span class="dot"></span>Decoding candidate captions</li>
+              <li data-step="2"><span class="dot"></span>Scoring &amp; re-ranking</li>
+              <li data-step="3"><span class="dot"></span>Polishing the result</li>
+            </ol>
+            <div class="skeleton-lines"><span></span><span></span><span></span></div>
+          </div>
+
+          <!-- Result -->
+          <div class="result" id="result" hidden>
+            <div class="caption-card">
+              <div class="caption-top">
+                <span class="caption-label"><svg><use href="#i-sparkles" /></svg> Generated caption</span>
+                <span class="tag" id="cachedTag" hidden>cached</span>
+              </div>
+              <p class="caption-text" id="captionText"></p>
+              <div class="caption-actions">
+                <button class="chip-btn" id="copyBtn" data-tip="Copy (C)"><svg><use href="#i-copy" /></svg>Copy</button>
+                <button class="chip-btn" id="speakBtn" data-tip="Speak (S)"><svg><use href="#i-volume" /></svg>Speak</button>
+                <button class="chip-btn" id="cardBtn" data-tip="Download a shareable card"><svg><use href="#i-download" /></svg>Card</button>
+                <button class="chip-btn" id="regenBtn" data-tip="Generate again (R)"><svg><use href="#i-refresh" /></svg>Again</button>
+              </div>
+            </div>
+
+            <div class="metrics">
+              <div class="metric">
+                <div class="ring" id="ringConfidence" style="--p:0"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="15.9"/><circle class="bar" cx="18" cy="18" r="15.9" pathLength="100"/></svg><span>0%</span></div>
+                <div><strong>Confidence</strong><small>Language model certainty</small></div>
+              </div>
+              <div class="metric">
+                <div class="ring alt" id="ringMatch" style="--p:0"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="15.9"/><circle class="bar" cx="18" cy="18" r="15.9" pathLength="100"/></svg><span>–</span></div>
+                <div><strong>Image match</strong><small>Verified by ITM model</small></div>
+              </div>
+              <div class="metric">
+                <div class="metric-big"><span id="timeValue">0</span><small>s</small></div>
+                <div><strong>Inference</strong><small id="timeDetail">on CPU</small></div>
+              </div>
+            </div>
+
+            <div class="tabs result-tabs" role="tablist" id="resultTabs">
+              <button role="tab" class="tab active" data-tab="candidates"><svg><use href="#i-layers" /></svg>Candidates</button>
+              <button role="tab" class="tab" data-tab="explain"><svg><use href="#i-eye" /></svg>Explain</button>
+              <button role="tab" class="tab" data-tab="ask"><svg><use href="#i-message" /></svg>Ask</button>
+              <button role="tab" class="tab" data-tab="match"><svg><use href="#i-scale" /></svg>Match</button>
+              <button role="tab" class="tab" data-tab="insights"><svg><use href="#i-palette" /></svg>Insights</button>
+              <span class="tab-indicator"></span>
+            </div>
+
+            <div class="tab-panels">
+              <!-- Candidates -->
+              <div class="tab-panel active" data-panel="candidates">
+                <p class="panel-note">Every candidate the model considered, ranked by a blend of language confidence and image-text match.</p>
+                <ol class="candidates" id="candidates"></ol>
+              </div>
+
+              <!-- Explain -->
+              <div class="tab-panel" data-panel="explain">
+                <p class="panel-note">Hover or tap a word to see which part of the image it came from (Grad-CAM on cross-attention).</p>
+                <div class="explain-words" id="explainWords"><span class="muted">Attention maps will appear here.</span></div>
+                <div class="explain-controls">
+                  <button class="chip-btn" id="explainPlay"><svg><use href="#i-play" /></svg>Play</button>
+                  <button class="chip-btn" id="explainOverall"><svg><use href="#i-target" /></svg>Whole caption</button>
+                  <label class="range-inline">Opacity <input type="range" id="heatOpacity" min="0.2" max="0.9" step="0.05" value="0.6" /></label>
+                  <button class="chip-btn" id="explainHide"><svg><use href="#i-x" /></svg>Hide</button>
+                </div>
+                <div class="word-conf">
+                  <h4>Word-by-word confidence</h4>
+                  <div class="word-bars" id="wordBars"></div>
+                </div>
+              </div>
+
+              <!-- Ask -->
+              <div class="tab-panel" data-panel="ask">
+                <div class="chat" id="chat">
+                  <div class="msg bot"><span class="avatar"><svg><use href="#i-sparkles" /></svg></span><p>Ask me anything about this image — colours, counts, objects, actions…</p></div>
+                </div>
+                <div class="chips" id="questionChips">
+                  <button type="button">What is the main object?</button>
+                  <button type="button">How many people are there?</button>
+                  <button type="button">What color is it?</button>
+                  <button type="button">Where was this taken?</button>
+                  <button type="button">What is the weather like?</button>
+                </div>
+                <form class="input-row" id="askForm">
+                  <input type="text" id="askInput" maxlength="200" placeholder="Type a question…" autocomplete="off" />
+                  <button class="btn btn-primary" type="submit" aria-label="Ask"><svg><use href="#i-send" /></svg></button>
+                </form>
+              </div>
+
+              <!-- Match -->
+              <div class="tab-panel" data-panel="match">
+                <p class="panel-note">Write your own descriptions — the matching model scores how well each one fits the image. Great for testing the AI!</p>
+                <form id="matchForm">
+                  <textarea id="matchInput" rows="3" placeholder="One description per line, e.g.&#10;a dog playing on the beach&#10;a cat sleeping on a sofa"></textarea>
+                  <button class="btn btn-primary" type="submit"><svg><use href="#i-scale" /></svg>Score descriptions</button>
+                </form>
+                <ol class="match-results" id="matchResults"></ol>
+              </div>
+
+              <!-- Insights -->
+              <div class="tab-panel" data-panel="insights">
+                <div class="insight-grid">
+                  <div class="insight">
+                    <h4><svg><use href="#i-hash" /></svg>Keywords &amp; hashtags</h4>
+                    <div class="tags" id="keywordTags"></div>
+                    <div class="tags hashtags" id="hashtagTags"></div>
+                  </div>
+                  <div class="insight">
+                    <h4><svg><use href="#i-palette" /></svg>Colour palette</h4>
+                    <div class="palette" id="palette"></div>
+                  </div>
+                  <div class="insight">
+                    <h4><svg><use href="#i-image" /></svg>Image details</h4>
+                    <dl class="kv" id="imageMeta"></dl>
+                  </div>
+                  <div class="insight">
+                    <h4><svg><use href="#i-clock" /></svg>Pipeline timing</h4>
+                    <div class="timing" id="timing"></div>
+                  </div>
+                  <div class="insight wide">
+                    <h4><svg><use href="#i-file" /></svg>Accessible alt-text</h4>
+                    <code class="alt-code" id="altText"></code>
+                    <button class="chip-btn" id="copyAltBtn"><svg><use href="#i-copy" /></svg>Copy HTML</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Batch ============ -->
+    <section class="section" id="batch">
+      <div class="section-head reveal">
+        <span class="kicker">02 · Batch mode</span>
+        <h2>Caption a whole <span class="gradient-text">album</span> at once.</h2>
+        <p>Drop up to 12 images and export every caption as CSV or JSON — perfect for datasets and alt-text audits.</p>
+      </div>
+      <div class="panel batch-panel reveal">
+        <label class="batch-drop" id="batchDrop" for="batchInput">
+          <input type="file" id="batchInput" accept="image/*" multiple hidden />
+          <svg><use href="#i-layers" /></svg>
+          <div><strong>Drop multiple images</strong><span>or click to choose files</span></div>
+          <span class="btn btn-ghost">Choose images</span>
+        </label>
+        <div class="batch-toolbar" id="batchToolbar" hidden>
+          <div class="batch-progress"><span id="batchProgressBar"></span></div>
+          <span id="batchStatus">0 / 0</span>
+          <button class="chip-btn" id="batchCsv"><svg><use href="#i-file" /></svg>CSV</button>
+          <button class="chip-btn" id="batchJson"><svg><use href="#i-download" /></svg>JSON</button>
+          <button class="chip-btn" id="batchClear"><svg><use href="#i-trash" /></svg>Clear</button>
+        </div>
+        <div class="batch-grid" id="batchGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ How it works ============ -->
+    <section class="section" id="how">
+      <div class="section-head reveal">
+        <span class="kicker">03 · Under the hood</span>
+        <h2>From pixels to prose in <span class="gradient-text">five steps</span>.</h2>
+        <p>PixelProse chains four transformer networks from Salesforce's BLIP family, all running on your own machine.</p>
+      </div>
+
+      <div class="flow reveal" id="flow">
+        <div class="flow-step"><div class="flow-icon"><svg><use href="#i-image" /></svg></div><h4>Pre-process</h4><p>Resize to 384×384, normalise colours, split into 24×24 = 576 patches of 16 px.</p></div>
+        <div class="flow-step"><div class="flow-icon"><svg><use href="#i-cpu" /></svg></div><h4>Vision Transformer</h4><p>ViT-L/16 turns each patch into a 1024-d vector using 24 layers of self-attention.</p></div>
+        <div class="flow-step"><div class="flow-icon"><svg><use href="#i-sparkles" /></svg></div><h4>Text decoder</h4><p>A BERT-style decoder writes the caption token by token, attending to image patches via cross-attention.</p></div>
+        <div class="flow-step"><div class="flow-icon"><svg><use href="#i-scale" /></svg></div><h4>Re-ranking</h4><p>Beam search + nucleus sampling produce candidates; the ITM model scores which fits the picture best.</p></div>
+        <div class="flow-step"><div class="flow-icon"><svg><use href="#i-eye" /></svg></div><h4>Explain</h4><p>Grad-CAM on cross-attention reveals the image region behind every word.</p></div>
+        <svg class="flow-line" preserveAspectRatio="none" viewBox="0 0 100 2" aria-hidden="true"><line x1="0" y1="1" x2="100" y2="1" /></svg>
+      </div>
+
+      <div class="tech-grid">
+        <article class="tech-card reveal">
+          <span class="tech-num">01</span>
+          <h3>BLIP captioner</h3>
+          <p><strong>Bootstrapping Language-Image Pre-training</strong> (Li et al., ICML 2022). Pre-trained on 129M image-text pairs and fine-tuned on COCO. Its <em>CapFilt</em> step generates and filters synthetic captions to clean noisy web data.</p>
+          <ul><li>ViT-L/16 encoder · 384 px</li><li>12-layer BERT decoder</li><li>446M parameters</li></ul>
+        </article>
+        <article class="tech-card reveal">
+          <span class="tech-num">02</span>
+          <h3>Smart decoding</h3>
+          <p>Beam search keeps the <em>k</em> most probable sentences; nucleus (top-p) sampling adds natural variety. Repetition penalties and n-gram blocking prevent loops like “a dog and a dog”.</p>
+          <ul><li>Beam width 1–10</li><li>Top-p 0.9, temperature control</li><li>Guided prefix captioning</li></ul>
+        </article>
+        <article class="tech-card reveal">
+          <span class="tech-num">03</span>
+          <h3>Self-verification</h3>
+          <p>A separate <strong>image-text matching</strong> model re-reads each candidate together with the image and outputs a match probability — a second opinion that catches hallucinated objects.</p>
+          <ul><li>ITM head + contrastive (ITC) similarity</li><li>Score = 0.65·match + 0.35·confidence</li></ul>
+        </article>
+        <article class="tech-card reveal">
+          <span class="tech-num">04</span>
+          <h3>Explainable AI</h3>
+          <p>We take the gradient of the match score with respect to the cross-attention map (layer 8) and weight the attention by it — <strong>Grad-CAM</strong> — producing a heatmap for each word.</p>
+          <ul><li>24×24 patch-level maps</li><li>Per-token probabilities</li></ul>
+        </article>
+        <article class="tech-card reveal">
+          <span class="tech-num">05</span>
+          <h3>Visual Q&amp;A</h3>
+          <p>BLIP-VQA encodes your question <em>together with</em> the image, then a decoder generates a short answer. Ask about colours, counts, places or actions.</p>
+          <ul><li>Open-ended answers</li><li>Chat-style interface</li></ul>
+        </article>
+        <article class="tech-card reveal">
+          <span class="tech-num">06</span>
+          <h3>Engineered for speed</h3>
+          <p>The image is encoded <em>once</em> and reused for every candidate; models load lazily and are cached; results are memoised by image hash. FP16 on GPUs, FP32 on CPUs.</p>
+          <ul><li>FastAPI + PyTorch</li><li>LRU caches · thread-safe locks</li></ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ Team ============ -->
+    <section class="section" id="team">
+      <div class="section-head reveal">
+        <span class="kicker">04 · The team</span>
+        <h2>Built by <span class="gradient-text">three engineers</span>.</h2>
+        <p>Advanced Artificial Intelligence project · Computer Engineering</p>
+      </div>
+      <div class="team-grid" id="teamGrid">
+        <article class="member reveal tilt">
+          <div class="avatar-ring"><span>KV</span></div>
+          <h3>Kartik Verma</h3>
+          <p class="role">Model pipeline &amp; backend</p>
+          <p>BLIP integration, decoding strategies, re-ranking and the FastAPI service.</p>
+        </article>
+        <article class="member reveal tilt">
+          <div class="avatar-ring r2"><span>DT</span></div>
+          <h3>Dhir Thakar</h3>
+          <p class="role">Interface &amp; experience</p>
+          <p>Web studio design, animations, attention explorer and accessibility.</p>
+        </article>
+        <article class="member reveal tilt">
+          <div class="avatar-ring r3"><span>KS</span></div>
+          <h3>Kushal Soni</h3>
+          <p class="role">Evaluation &amp; research</p>
+          <p>Benchmarking with BLEU/ROUGE, VQA testing, documentation and research.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="brand small"><svg class="brand-mark" viewBox="0 0 40 40"><rect x="1" y="1" width="38" height="38" rx="11" fill="url(#brandGrad)" /><path d="M9 17c3.2-5 7-7.5 11-7.5S27.8 12 31 17c-3.2 5-7 7.5-11 7.5S12.2 22 9 17z" fill="none" stroke="#fff" stroke-width="2.2" /><circle cx="20" cy="17" r="3.4" fill="#fff" /><rect x="11" y="28.5" width="18" height="2.6" rx="1.3" fill="#fff" /></svg><span class="brand-name">Pixel<span>Prose</span></span></div>
+    <p>Kartik Verma · Dhir Thakar · Kushal Soni — Advanced AI Project</p>
+    <p class="muted">Models: Salesforce BLIP (BSD-3-Clause) · Press <kbd>?</kbd> for keyboard shortcuts</p>
+  </footer>
+
+  <!-- ============ History drawer ============ -->
+  <aside class="drawer" id="drawer" aria-hidden="true" aria-label="Caption history">
+    <div class="drawer-head">
+      <h3><svg><use href="#i-history" /></svg> History</h3>
+      <div>
+        <button class="chip-btn" id="historyExport"><svg><use href="#i-download" /></svg>Export</button>
+        <button class="chip-btn" id="historyClear"><svg><use href="#i-trash" /></svg>Clear</button>
+        <button class="icon-btn" id="drawerClose" aria-label="Close history"><svg><use href="#i-x" /></svg></button>
+      </div>
+    </div>
+    <ul class="history-list" id="historyList"></ul>
+    <p class="history-empty" id="historyEmpty">No captions yet. Your last 30 results are saved in this browser.</p>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <!-- ============ Shortcuts modal ============ -->
+  <div class="modal" id="shortcuts" role="dialog" aria-modal="true" aria-labelledby="shortcutsTitle" hidden>
+    <div class="modal-card">
+      <h3 id="shortcutsTitle"><svg><use href="#i-keyboard" /></svg> Keyboard shortcuts</h3>
+      <dl class="shortcut-list">
+        <div><dt><kbd>Ctrl</kbd>+<kbd>V</kbd></dt><dd>Paste an image</dd></div>
+        <div><dt><kbd>Ctrl</kbd>+<kbd>Enter</kbd></dt><dd>Generate caption</dd></div>
+        <div><dt><kbd>R</kbd></dt><dd>Generate again</dd></div>
+        <div><dt><kbd>C</kbd></dt><dd>Copy caption</dd></div>
+        <div><dt><kbd>S</kbd></dt><dd>Speak caption</dd></div>
+        <div><dt><kbd>H</kbd></dt><dd>Toggle history</dd></div>
+        <div><dt><kbd>T</kbd></dt><dd>Toggle theme</dd></div>
+        <div><dt><kbd>Esc</kbd></dt><dd>Close / clear image</dd></div>
+      </dl>
+      <button class="btn btn-ghost" data-close>Got it</button>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <div class="tooltip" id="tooltip" role="tooltip"></div>
+
+  <script type="module" src="/static/js/main.js"></script>
+</body>
+</html>
