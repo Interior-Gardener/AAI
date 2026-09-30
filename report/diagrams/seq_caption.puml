@@ -1,0 +1,41 @@
+@startuml
+!include _style.iuml
+autonumber
+actor User
+participant "Browser UI\n(studio.js)" as UI
+participant "FastAPI\n(main.py)" as API
+participant "Image Utils" as IMG
+participant "Captioner" as CAP
+participant "Model Manager" as MM
+participant "BLIP-Large" as BL
+participant "Matcher (ITM)" as ITM
+User -> UI : choose image, click Generate
+UI -> UI : show scanning animation
+UI -> API : POST /api/caption (file, settings)
+API -> IMG : load_image(bytes)
+IMG --> API : RGB image + SHA-1 id
+API -> API : result cache lookup
+alt cache hit
+  API --> UI : cached result
+else cache miss
+  API -> CAP : caption(image, options)
+  CAP -> MM : get("caption-large")
+  MM --> CAP : processor + model
+  CAP -> BL : vision_model(pixels)
+  BL --> CAP : image embeddings [577 x 1024]
+  CAP -> BL : text_decoder.generate(beam search)
+  BL --> CAP : candidate token sequences
+  CAP -> BL : teacher-forced forward pass
+  BL --> CAP : token log-probabilities
+  CAP -> ITM : score(image, candidates)
+  ITM --> CAP : match probabilities
+  CAP --> API : best caption + candidates + timings
+  API -> API : store in cache
+  API --> UI : JSON (caption, scores, palette, metadata)
+end
+UI -> User : word-by-word reveal, rings, tabs
+UI -> API : POST /api/explain (image_id, caption)
+API -> ITM : ground(image, caption)
+ITM --> API : 24x24 Grad-CAM maps per word
+API --> UI : heatmaps
+@enduml

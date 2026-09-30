@@ -18,3 +18,5 @@ reports/*.json
 .DS_Store
 Thumbs.db
 presentation/node_modules/
+report/node_modules/
+report/.search.json

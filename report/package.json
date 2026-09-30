@@ -1,0 +1,11 @@
+{
+  "name": "pixelprose-report",
+  "private": true,
+  "description": "Generates PixelProse_Major_Project_Report.docx (KJSIT Major Project-B format)",
+  "scripts": { "build": "python build.py" },
+  "dependencies": {
+    "docx": "^9.5.1",
+    "jszip": "^3.10.1",
+    "sharp": "^0.34.3"
+  }
+}

@@ -1,0 +1,83 @@
+@startuml
+!include _style.iuml
+hide empty members
+class Settings {
+  caption_model_large: str
+  caption_model_base: str
+  itm_model: str
+  vqa_model: str
+  device: str
+  preload: bool
+  max_upload_mb: int
+}
+class ModelManager {
+  device: torch.device
+  dtype: torch.dtype
+  get(key): LoadedModel
+  preload(keys)
+  status(): dict
+}
+class LoadedModel {
+  key: str
+  processor: BlipProcessor
+  model: nn.Module
+  lock: RLock
+}
+class CaptionOptions {
+  model: str
+  strategy: str
+  num_candidates: int
+  num_beams: int
+  top_p: float
+  temperature: float
+  prompt: str
+  rerank: bool
+  normalized()
+  cache_key()
+}
+class Captioner {
+  caption(image, opts): dict
+  -_encode()
+  -_decode()
+  -_score()
+}
+class Matcher {
+  score(image, texts): list
+  ground(image, text): dict
+}
+class QuestionAnswerer {
+  answer(image, question): dict
+}
+class LRUCache {
+  capacity: int
+  get(key)
+  put(key, value)
+  stats()
+}
+class LoadedImage {
+  image: PIL.Image
+  digest: str
+  format: str
+  original_size
+}
+class "text_utils" as TU <<module>> {
+  clean_caption()
+  keywords()
+  hashtags()
+  format_outputs()
+}
+class "metrics" as MT <<module>> {
+  bleu()
+  rouge_l()
+  cider_d()
+}
+ModelManager o-- "0..4" LoadedModel
+ModelManager --> Settings
+Captioner --> ModelManager
+Captioner --> Matcher
+Captioner ..> CaptionOptions
+Captioner ..> TU
+Matcher --> ModelManager
+QuestionAnswerer --> ModelManager
+LRUCache o-- LoadedImage
+@enduml

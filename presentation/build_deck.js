@@ -620,7 +620,7 @@ Three: BLIP-large sometimes outputs nonsense words like "arafed". It learned the
       ["LuServer", "FastAPI + Uvicorn", "REST API + OpenAPI docs"],
       ["LuImage", "Pillow", "decoding, EXIF, palette"],
       ["LuCode", "HTML · CSS · JavaScript", "ES modules, Canvas, Web Speech"],
-      ["LuTestTube", "pytest", "35 tests, models mocked"],
+      ["LuTestTube", "pytest", "36 tests, models mocked"],
     ];
     for (let i = 0; i < stack.length; i++) {
       const [ic, h, d] = stack[i];
@@ -632,7 +632,7 @@ Three: BLIP-large sometimes outputs nonsense words like "arafed". It learned the
     }
     card(s, 7.45, 1.95, 5.3, 4.3, C.card2);
     s.addText("By the numbers", { x: 7.75, y: 2.1, w: 4.7, h: 0.4, fontFace: HEAD, fontSize: 16, bold: true, color: C.text, margin: 0, isTextBox: true });
-    const nums = [["4", "transformer models"], ["~1.25 B", "parameters in total"], ["8", "REST endpoints"], ["22", "features"], ["44", "sample images"], ["35", "automated tests"]];
+    const nums = [["4", "transformer models"], ["~1.25 B", "parameters in total"], ["8", "REST endpoints"], ["22", "features"], ["44", "sample images"], ["36", "automated tests"]];
     nums.forEach(([b, t], i) => {
       const x = 7.75 + (i % 2) * 2.5, y = 2.7 + Math.floor(i / 2) * 1.12;
       s.addText(b, { x, y, w: 2.3, h: 0.55, fontFace: HEAD, fontSize: 28, bold: true, color: [C.violet, C.cyan][i % 2], margin: 0, isTextBox: true });
@@ -641,7 +641,7 @@ Three: BLIP-large sometimes outputs nonsense words like "arafed". It learned the
     footer(s, n);
     s.addNotes(`SPEAKER: Kushal Soni  (~40 s)
 
-Our stack: Python, PyTorch and Hugging Face Transformers for the AI; FastAPI and Uvicorn for the server; Pillow for image processing; plain HTML, CSS and JavaScript for the interface, using the Canvas API for heatmaps and the Web Speech API for text-to-speech; and pytest for 35 automated tests. The neural networks are mocked in the tests, so the whole suite runs in about five seconds.
+Our stack: Python, PyTorch and Hugging Face Transformers for the AI; FastAPI and Uvicorn for the server; Pillow for image processing; plain HTML, CSS and JavaScript for the interface, using the Canvas API for heatmaps and the Web Speech API for text-to-speech; and pytest for 36 automated tests. The neural networks are mocked in the tests, so the whole suite runs in about five seconds.
 
 In total: four transformer models with about 1.25 billion parameters, eight REST endpoints and 22 features.`);
   }

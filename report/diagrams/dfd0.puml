@@ -1,0 +1,13 @@
+@startuml
+!include _style.iuml
+left to right direction
+rectangle "User" as U #EDE9FE
+rectangle "Developer /\nAPI client" as D #EDE9FE
+usecase "0\nPixelProse\nImage Caption\nGenerator" as P
+database "Model\nweights" as W
+U --> P : image, settings,\nquestions, descriptions
+P --> U : caption, scores,\nheatmaps, answers
+D --> P : REST requests
+P --> D : JSON responses
+W --> P : pre-trained\nparameters
+@enduml
