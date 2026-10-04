@@ -1,0 +1,28 @@
+@startuml
+!include _style.iuml
+autonumber
+actor User
+participant "Ask tab\n(chat.js)" as UI
+participant "FastAPI" as API
+participant "Image store\n(LRU cache)" as ST
+participant "QuestionAnswerer" as QA
+participant "BLIP-VQA" as V
+User -> UI : type question
+UI -> UI : show typing indicator
+UI -> API : POST /api/vqa {image_id, question}
+API -> ST : get(image_id)
+alt image expired
+  ST --> API : None
+  API --> UI : 404 "upload again"
+else found
+  ST --> API : image
+  API -> QA : answer(image, question)
+  QA -> V : encode image (ViT-B/16)
+  QA -> V : encode question with cross-attention
+  QA -> V : decode answer (beam = 3)
+  V --> QA : answer tokens + score
+  QA --> API : {answer, confidence, time}
+  API --> UI : JSON
+  UI -> User : chat bubble with answer
+end
+@enduml

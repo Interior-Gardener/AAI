@@ -1,0 +1,49 @@
+@startuml
+!include _style.iuml
+package "Browser (static/)" {
+  [index.html + styles.css] as H
+  [studio.js] as S
+  [explain.js] as E
+  [chat.js] as C
+  [batch.js] as B
+  [history.js] as HI
+  [api.js] as A
+  database "localStorage" as LS
+}
+package "Server (app/)" {
+  [FastAPI routes\nmain.py] as R
+  [Captioner] as CA
+  [Matcher] as MA
+  [QuestionAnswerer] as QA
+  [Image utils] as IU
+  [Text utils] as TU
+  [LRU caches] as LC
+  [ModelManager] as MM
+}
+package "Models (Hugging Face / local)" {
+  [BLIP-large captioner] as M1
+  [BLIP-base captioner] as M2
+  [BLIP ITM] as M3
+  [BLIP VQA] as M4
+}
+S --> A
+E --> A
+C --> A
+B --> A
+HI --> LS
+A --> R : HTTP / JSON
+R --> IU
+R --> LC
+R --> CA
+R --> MA
+R --> QA
+CA --> TU
+CA --> MA
+CA --> MM
+MA --> MM
+QA --> MM
+MM --> M1
+MM --> M2
+MM --> M3
+MM --> M4
+@enduml

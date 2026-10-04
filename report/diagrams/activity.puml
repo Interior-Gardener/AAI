@@ -1,0 +1,43 @@
+@startuml
+!include _style.iuml
+start
+:User opens PixelProse;
+:Select input source;
+if (Source?) then (upload / paste / drop)
+  :Read local file;
+elseif (URL) then
+  :Server downloads image\n(SSRF checks);
+elseif (camera) then
+  :Capture webcam frame;
+else (sample)
+  :Load bundled sample;
+endif
+:Validate image (type, size, format);
+if (Valid?) then (no)
+  :Show error toast;
+  stop
+else (yes)
+endif
+:Preprocess (EXIF rotate, RGB, 384x384);
+:Encode with Vision Transformer;
+:Decode candidates (beam search / sampling);
+:Score tokens → confidence;
+if (Re-rank enabled?) then (yes)
+  :ITM match for each candidate;
+  :score = 0.65·match + 0.35·confidence;
+else (no)
+  :score = confidence;
+endif
+:Select best caption;
+:Post-process (clean, keywords, hashtags,\npalette, alt-text);
+:Display result with animations;
+fork
+  :Compute Grad-CAM heatmaps;
+fork again
+  :Save to history;
+fork again
+  :Optional: speak caption;
+end fork
+:User explores Explain / Ask / Match;
+stop
+@enduml

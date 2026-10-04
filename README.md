@@ -147,11 +147,15 @@ Then point `.env` at the folders (see the bottom of `.env.example`).
 
 ```bash
 pip install -r requirements-dev.txt
-pytest                         # 35 tests, models mocked, ~5 s
+pytest                         # 36 tests, models mocked, ~5 s
 python scripts/evaluate.py     # benchmark (~20 min on CPU)
 ```
 
-The presentation is generated from code: `cd presentation && npm install && node build_deck.js`.
+The presentation and the report are generated from code:
+```bash
+cd presentation && npm install && node build_deck.js          # slide deck
+cd report && npm install && python build.py                   # project report (needs LibreOffice for page numbers)
+```
 
 ## Project structure
 
@@ -163,6 +167,7 @@ sample_images/  44 test images in 6 categories + references.json
 tests/          pytest suite
 docs/           FEATURES · ARCHITECTURE · API · EVALUATION · PRESENTATION_GUIDE
 presentation/   PixelProse_Presentation.pptx (with speaker notes) + generator
+report/         Major Project-B report (.docx/.pdf), UML sources, figures, generator
 reports/        evaluation.json (benchmark output)
 ```
 
@@ -176,6 +181,7 @@ reports/        evaluation.json (benchmark output)
 | [API.md](docs/API.md) | REST endpoints with examples |
 | [PRESENTATION_GUIDE.md](docs/PRESENTATION_GUIDE.md) | Speaker split, slide-by-slide script, demo run-sheet, viva Q&A |
 | [presentation/](presentation) | The 17-slide deck, with the script in the speaker notes |
+| [report/](report) | Major Project-B report in the KJSIT format (`.docx` + `.pdf`, 79 pages) with its generator |
 
 ## Troubleshooting
 

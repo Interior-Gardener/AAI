@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -50,6 +51,8 @@ app = FastAPI(
     version=__version__,
     description="Generate, explain and interrogate image captions with Salesforce BLIP.",
     lifespan=lifespan,
+    docs_url=None,  # served below from local files so the docs also work offline
+    redoc_url=None,
 )
 app.add_middleware(GZipMiddleware, minimum_size=1024)
 
@@ -255,6 +258,17 @@ if settings.samples_dir.is_dir():
 @app.get("/", include_in_schema=False)
 def index():
     return FileResponse(settings.static_dir / "index.html")
+
+
+@app.get("/docs", include_in_schema=False)
+def api_docs():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=f"{app.title} — API docs",
+        swagger_js_url="/static/vendor/swagger-ui/swagger-ui-bundle.js",
+        swagger_css_url="/static/vendor/swagger-ui/swagger-ui.css",
+        swagger_favicon_url="/static/assets/favicon.svg",
+    )
 
 
 @app.get("/favicon.ico", include_in_schema=False)

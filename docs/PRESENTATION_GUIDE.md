@@ -85,7 +85,7 @@ Follow the **demo run-sheet** in section 4 below.
 “Three problems taught us the most. **One:** when we first tested the matching model it said a correct caption matched with only 2% probability. After debugging, we found the configuration used 8 attention heads instead of BLIP's 12. The weights loaded without any error, but the maths was wrong. Fixing it brought the score to 99.6%. Lesson: *silent* errors are the dangerous ones, so always validate against known outputs. **Two:** in the browser, captioning sometimes took over 90 seconds instead of 5. PyTorch's threads spin-wait, and when the browser's animations used one core, all four threads stalled. Leaving one core free made it more than 10 times faster. **Three:** BLIP-large sometimes outputs nonsense words like ‘arafed’. Conditioning on the prompt it was trained with, plus a cleanup step, fixed it.”
 
 ### Slide 15: Tech stack (Kushal)
-“Our stack: Python, PyTorch and Hugging Face Transformers for the AI; FastAPI and Uvicorn for the server; Pillow for images; vanilla HTML, CSS and JavaScript for the interface; and pytest with 35 automated tests. The neural networks are mocked in the tests, so they run in about 5 seconds.”
+“Our stack: Python, PyTorch and Hugging Face Transformers for the AI; FastAPI and Uvicorn for the server; Pillow for images; vanilla HTML, CSS and JavaScript for the interface; and pytest with 36 automated tests. The neural networks are mocked in the tests, so they run in about 5 seconds.”
 
 ### Slide 16: Future scope (Kushal)
 “Where next? Captions in Indian languages like Hindi and Gujarati through a translation model. Larger vision-language models such as BLIP-2 or Florence-2 for paragraph-length descriptions when a GPU is available. Video captioning. Fine-tuning on Indian scenes, because most training data is Western. And model quantisation, so it runs on phones.”
@@ -170,7 +170,7 @@ A: Each member should prepare a 30-second honest answer about the parts they wor
 1. **Lead with the demo effect.** Mention in the first minute that there will be a live demo. It keeps attention.
 2. **Pause on the heatmap.** Stay silent for 2–3 seconds while “dog” lights up. Visuals speak louder than words.
 3. **Use the audience.** Ask a faculty member for an object or a description to test in *Match*. Interaction is memorable.
-4. **Numbers beat adjectives.** Say “99.7% match, 446 million parameters, 35 tests”, not “very accurate, very big”.
+4. **Numbers beat adjectives.** Say “99.7% match, 446 million parameters, 36 tests”, not “very accurate, very big”.
 5. **Hand-offs:** end your part with a clear handover (“Now Kushal will explain the model”).
 6. **Dress the screen:** dark theme, full screen, hide the bookmarks bar, zoom to 110% on large projectors.
 7. **Own the mistakes.** If the AI gets something wrong, explain why with the Explain tab. That shows real understanding.

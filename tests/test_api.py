@@ -47,6 +47,12 @@ def test_index_and_static(client):
     assert client.get("/static/js/main.js").status_code == 200
 
 
+def test_api_docs_are_self_hosted(client):
+    html = client.get("/docs").text
+    assert "/static/vendor/swagger-ui/swagger-ui-bundle.js" in html
+    assert client.get("/static/vendor/swagger-ui/swagger-ui-bundle.js").status_code == 200
+
+
 def test_health(client):
     body = client.get("/api/health").json()
     assert body["status"] == "ok"

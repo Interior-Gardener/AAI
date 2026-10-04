@@ -1,0 +1,29 @@
+@startuml
+!include _style.iuml
+rectangle "User" as U #EDE9FE
+usecase "1.0\nAcquire &\nvalidate image" as P1
+usecase "2.0\nPre-process\n& encode (ViT)" as P2
+usecase "3.0\nDecode\ncandidates" as P3
+usecase "4.0\nScore &\nre-rank" as P4
+usecase "5.0\nPost-process\n& present" as P5
+usecase "6.0\nExplain\n(Grad-CAM)" as P6
+usecase "7.0\nAnswer\nquestions" as P7
+database "D1 Image store" as D1
+database "D2 Result cache" as D2
+database "D3 Browser history" as D3
+U --> P1 : image file / URL
+P1 --> D1 : image + id
+P1 --> P2 : RGB image
+P2 --> P3 : image embeddings
+P3 --> P4 : candidate captions
+P4 --> P5 : ranked captions
+P5 --> D2 : result
+P5 --> U : caption, scores, insights
+P5 --> D3 : thumbnail + result
+U --> P6 : word hover
+D1 --> P6 : image
+P6 --> U : heatmap
+U --> P7 : question
+D1 --> P7 : image
+P7 --> U : answer
+@enduml

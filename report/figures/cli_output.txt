@@ -1,0 +1,18 @@
+$ python cli.py sample_images/animals/giraffe_and_zebra.jpg sample_images/people/street_with_bus.jpg --ask "what animals are there?" --ask "what color is the bus?"
+Loading models on cpu (first run downloads them)…
+
+sample_images/animals/giraffe_and_zebra.jpg
+  A giraffe standing next to a zebra in a field.
+  confidence 66.5% · match 92.9% · 4.4s · #giraffe #zebra #field
+  2. a giraffe and a zebra in a grassy field  (0.822)
+  3. a giraffe and a zebra standing in a field  (0.814)
+  Q: what animals are there?  giraffe and zebra
+  Q: what color is the bus?  no bus
+
+sample_images/people/street_with_bus.jpg
+  A group of people crossing a street in front of a bus.
+  confidence 58.5% · match 61.8% · 3.6s · #group #people #crossing #street #bus
+  2. a group of people crossing the street in front of a bus  (0.561)
+  3. a group of people walking across a street next to a bus  (0.558)
+  Q: what animals are there?  none
+  Q: what color is the bus?  blue
