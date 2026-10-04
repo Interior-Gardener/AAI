@@ -243,7 +243,12 @@ Dhir will show all of this live in a few minutes.`);
       s.addText([{ text: head, options: { bold: true, color: C.text, fontSize: 15, breakLine: true } }, { text: sub, options: { color: C.muted, fontSize: 11 } }],
         { x: x + 0.15, y, w: w - 0.3, h, fontFace: BODY, align: "center", valign: "middle", margin: 0, isTextBox: true });
     };
-    const arrow = (x1, y1, x2, y2) => s.addShape(pres.shapes.LINE, { x: x1, y: y1, w: x2 - x1, h: y2 - y1, line: { color: C.dim, width: 1.5, endArrowType: "triangle" } });
+    // Shape sizes must never be negative (PowerPoint "repairs" the file and drops content),
+    // so an upward arrow is drawn top-down and flipped vertically.
+    const arrow = (x1, y1, x2, y2) => s.addShape(pres.shapes.LINE, {
+      x: x1, y: Math.min(y1, y2), w: x2 - x1, h: Math.max(Math.abs(y2 - y1), 0.001), flipV: y2 < y1,
+      line: { color: C.dim, width: 1.5, endArrowType: "triangle" },
+    });
     // columns
     s.addText("FRONTEND", { x: M, y: 1.85, w: 2.6, h: 0.3, fontFace: HEAD, fontSize: 11, bold: true, color: C.cyan, charSpacing: 2, margin: 0, isTextBox: true });
     s.addText("API SERVER", { x: 3.75, y: 1.85, w: 2.6, h: 0.3, fontFace: HEAD, fontSize: 11, bold: true, color: C.violet, charSpacing: 2, margin: 0, isTextBox: true });
@@ -615,7 +620,7 @@ Three: BLIP-large sometimes outputs nonsense words like "arafed". It learned the
       ["LuServer", "FastAPI + Uvicorn", "REST API + OpenAPI docs"],
       ["LuImage", "Pillow", "decoding, EXIF, palette"],
       ["LuCode", "HTML · CSS · JavaScript", "ES modules, Canvas, Web Speech"],
-      ["LuTestTube", "pytest", "35 tests, models mocked"],
+      ["LuTestTube", "pytest", "36 tests, models mocked"],
     ];
     for (let i = 0; i < stack.length; i++) {
       const [ic, h, d] = stack[i];
@@ -627,7 +632,7 @@ Three: BLIP-large sometimes outputs nonsense words like "arafed". It learned the
     }
     card(s, 7.45, 1.95, 5.3, 4.3, C.card2);
     s.addText("By the numbers", { x: 7.75, y: 2.1, w: 4.7, h: 0.4, fontFace: HEAD, fontSize: 16, bold: true, color: C.text, margin: 0, isTextBox: true });
-    const nums = [["4", "transformer models"], ["~1.25 B", "parameters in total"], ["8", "REST endpoints"], ["22", "features"], ["44", "sample images"], ["35", "automated tests"]];
+    const nums = [["4", "transformer models"], ["~1.25 B", "parameters in total"], ["8", "REST endpoints"], ["22", "features"], ["44", "sample images"], ["36", "automated tests"]];
     nums.forEach(([b, t], i) => {
       const x = 7.75 + (i % 2) * 2.5, y = 2.7 + Math.floor(i / 2) * 1.12;
       s.addText(b, { x, y, w: 2.3, h: 0.55, fontFace: HEAD, fontSize: 28, bold: true, color: [C.violet, C.cyan][i % 2], margin: 0, isTextBox: true });
@@ -636,7 +641,7 @@ Three: BLIP-large sometimes outputs nonsense words like "arafed". It learned the
     footer(s, n);
     s.addNotes(`SPEAKER: Kushal Soni  (~40 s)
 
-Our stack: Python, PyTorch and Hugging Face Transformers for the AI; FastAPI and Uvicorn for the server; Pillow for image processing; plain HTML, CSS and JavaScript for the interface, using the Canvas API for heatmaps and the Web Speech API for text-to-speech; and pytest for 35 automated tests. The neural networks are mocked in the tests, so the whole suite runs in about five seconds.
+Our stack: Python, PyTorch and Hugging Face Transformers for the AI; FastAPI and Uvicorn for the server; Pillow for image processing; plain HTML, CSS and JavaScript for the interface, using the Canvas API for heatmaps and the Web Speech API for text-to-speech; and pytest for 36 automated tests. The neural networks are mocked in the tests, so the whole suite runs in about five seconds.
 
 In total: four transformer models with about 1.25 billion parameters, eight REST endpoints and 22 features.`);
   }
@@ -700,7 +705,21 @@ Q&A prep: see docs/PRESENTATION_GUIDE.md section 5 (did you train it, CNN-LSTM v
 
   const out = path.join(__dirname, "PixelProse_Presentation.pptx");
   await pres.writeFile({ fileName: out });
+  await checkGeometry(out);
   console.log("wrote", out, `(${n} slides)`);
+}
+
+/** PowerPoint silently drops shapes with negative offsets/sizes or NaN values, so fail loudly instead. */
+async function checkGeometry(file) {
+  const JSZip = require("jszip");
+  const zip = await JSZip.loadAsync(fs.readFileSync(file));
+  const problems = [];
+  for (const name of Object.keys(zip.files).filter((f) => /^ppt\/(slides|charts)\/[^/]+\.xml$/.test(f))) {
+    const xml = await zip.file(name).async("string");
+    if (/NaN|undefined|Infinity/.test(xml)) problems.push(`${name}: NaN/undefined value`);
+    for (const m of xml.matchAll(/<a:(off|ext) [^>]*?(x|y|cx|cy)="(-\d+)"/g)) problems.push(`${name}: negative ${m[2]}=${m[3]}`);
+  }
+  if (problems.length) throw new Error("Invalid geometry:\n" + problems.join("\n"));
 }
 
 build().catch((e) => {

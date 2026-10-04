@@ -1,6 +1,6 @@
 # PixelProse REST API
 
-Base URL: `http://127.0.0.1:8000`. Interactive docs are at **`/docs`** (Swagger UI) and **`/redoc`**.
+Base URL: `http://127.0.0.1:8000`. Interactive docs (Swagger UI, served locally so they work offline) are at **`/docs`**.
 
 | Method | Path | Body | Purpose |
 |---|---|---|---|

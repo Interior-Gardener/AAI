@@ -1,0 +1,40 @@
+@startuml
+!include _style.iuml
+left to right direction
+actor "User" as U
+actor "Developer\n(API client)" as D
+actor "BLIP Models" as M <<system>>
+rectangle "PixelProse System" {
+  usecase "Provide image\n(upload / paste / URL /\ncamera / sample)" as UC1
+  usecase "Generate caption" as UC2
+  usecase "Configure generation\nsettings" as UC3
+  usecase "View candidates\n& confidence" as UC4
+  usecase "Explain caption\n(attention heatmaps)" as UC5
+  usecase "Ask question (VQA)" as UC6
+  usecase "Score custom\ndescriptions (Match)" as UC7
+  usecase "Batch caption &\nexport CSV / JSON" as UC8
+  usecase "Speak caption /\ndownload card" as UC9
+  usecase "Browse & restore\nhistory" as UC10
+  usecase "Call REST API" as UC11
+}
+U --> UC1
+U --> UC2
+U --> UC3
+U --> UC4
+U --> UC5
+U --> UC6
+U --> UC7
+U --> UC8
+U --> UC9
+U --> UC10
+D --> UC11
+UC2 .> UC1 : <<include>>
+UC3 .> UC2 : <<extend>>
+UC4 .> UC2 : <<extend>>
+UC5 .> UC2 : <<extend>>
+UC11 .> UC2 : <<include>>
+UC2 --> M
+UC5 --> M
+UC6 --> M
+UC7 --> M
+@enduml

@@ -193,4 +193,4 @@ It uses the same services as the web app, with no server needed.
 - Uploads are validated (type, 15 MB limit, decompression-bomb guard, EXIF rotation, transparency flattened)
 - URL fetching allows only `http/https`, blocks private/loopback addresses (SSRF protection) and re-checks after redirects
 - Every request body is validated by Pydantic; errors come back as readable messages shown as toasts
-- 35 automated tests (`pytest`) cover the API, image handling, text processing and metrics, with the neural networks mocked so they run in seconds
+- 36 automated tests (`pytest`) cover the API, image handling, text processing and metrics, with the neural networks mocked so they run in seconds

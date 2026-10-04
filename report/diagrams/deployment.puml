@@ -1,0 +1,22 @@
+@startuml
+!include _style.iuml
+node "Student laptop / PC\n(Windows, macOS or Linux)" {
+  node "Web browser\n(Chrome / Edge / Firefox)" as BR {
+    artifact "PixelProse SPA\n(HTML, CSS, JS modules)"
+  }
+  node "Python 3.10+ runtime" as PY {
+    artifact "Uvicorn ASGI server :8000"
+    artifact "FastAPI application"
+    artifact "PyTorch + Transformers"
+  }
+  database "Hugging Face cache\n(~4 GB model weights)" as HF
+  node "CPU / CUDA GPU / Apple MPS" as HW
+}
+cloud "Hugging Face Hub\n(first run only)" as HUB
+node "Phone on same Wi-Fi\n(optional)" as PH
+BR --> PY : HTTP 127.0.0.1:8000
+PH ..> PY : HTTP LAN (HOST=0.0.0.0)
+PY --> HF : load weights
+PY --> HW : tensor compute
+HF <.. HUB : one-time download
+@enduml

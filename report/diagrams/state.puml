@@ -1,0 +1,22 @@
+@startuml
+!include _style.iuml
+[*] --> Empty
+Empty --> ImageSelected : upload / paste / URL /\ncamera / sample
+ImageSelected --> Empty : clear (Esc)
+ImageSelected --> Generating : Generate (Ctrl+Enter)
+Generating --> ResultShown : response OK
+Generating --> ImageSelected : error (toast)
+state ResultShown {
+  [*] --> Candidates
+  Candidates --> Explain : tab
+  Explain --> Ask : tab
+  Ask --> Match : tab
+  Match --> Insights : tab
+  Insights --> Candidates : tab
+  Explain : hover word → heatmap
+  Ask : question → answer
+}
+ResultShown --> Generating : Again (R) /\nchange settings
+ResultShown --> ImageSelected : new image
+ResultShown --> Empty : clear
+@enduml
